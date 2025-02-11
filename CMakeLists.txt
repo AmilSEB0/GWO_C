@@ -12,5 +12,5 @@ add_executable(GWO_C main.cpp
         utils/Agent.cpp
         utils/Target.h
         utils/Target.cpp
-        utils/Space.cpp
-        utils/Space.h)
+        utils/FloatVar.h
+        utils/FloatVar.cpp)

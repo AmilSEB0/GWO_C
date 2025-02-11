@@ -5,29 +5,27 @@
 #ifndef AGENT_H
 #define AGENT_H
 
+#include <vector>
+#include "Target.h"
+
 class Agent {
-    public:
-        // Constructeur
-        Agent(std::vector<double> solution = {}, Target* target = nullptr, std::unordered_map<std::string, std::string> kwargs = {});
+public:
+    Agent(const std::vector<double>& solution, const Target& target);
 
-        // Méthode pour obtenir l'ID
-        static int increase();
+    // Méthode de copie
+    Agent copy() const;
 
-        // Méthode pour créer une copie d'agent
-        Agent* copy() const;
+    // Accesseurs (Getters)
+    std::vector<double> get_solution() const;
+    Target get_target() const;
 
-        // Attributs de l'agent
-        std::vector<double> solution;
-        Target* target;
-        int id;
-        std::unordered_map<std::string, std::string> kwargs;
+    // Mutateurs (Setters)
+    void set_solution(const std::vector<double>& solution);
+    void set_target(const Target& target);
 
-    private:
-        // Méthode pour gérer les arguments supplémentaires (kwargs)
-        void set_kwargs(const std::unordered_map<std::string, std::string>& kwargs);
-
-        // Variable statique pour l'ID de l'agent
-        static int ID;
-
+private:
+    std::vector<double> solution;
+    Target target;
 };
-#endif //AGENT_H
+
+#endif // AGENT_H
