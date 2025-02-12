@@ -7,11 +7,13 @@
 Agent::Agent(const std::vector<double>& solution, const Target& target)
     : solution(solution), target(target) {}
 
-// Méthode de copie
-Agent Agent::copy() const {
-    Agent agent(*this); // Copie de l’instance actuelle
+// Constructeur
+Agent::Agent(){}
 
-    // Ajout d’autres attributs si nécessaire (non précisés dans la classe d'origine)
+// Méthode de copie
+Agent* Agent::copy() const {
+    Agent* agent = new Agent(*this); // Allocation dynamique d'une copie de l'instance actuelle
+    // Ajout d'autres attributs si nécessaire (non précisés dans la classe d'origine)
     return agent;
 }
 

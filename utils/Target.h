@@ -13,7 +13,7 @@ public:
     Target(const std::vector<double>& objectives = {}, const std::vector<double>& weights = {});
 
     // Méthode de copie
-    Target copy() const;  // Retourne un objet par valeur
+    Target* copy() const;  // Retourne un objet par valeur
 
     // Getters
     std::vector<double> objectives() const;

@@ -11,9 +11,10 @@
 class Agent {
 public:
     Agent(const std::vector<double>& solution, const Target& target);
+    Agent();
 
     // Méthode de copie
-    Agent copy() const;
+    Agent* copy() const;
 
     // Accesseurs (Getters)
     std::vector<double> get_solution() const;

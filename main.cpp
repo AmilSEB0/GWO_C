@@ -1,64 +1,48 @@
 #include <iostream>
 #include <vector>
-#include "utils/Agent.h"
-#include "utils/Target.h"  // Assurez-vous d'inclure le fichier d'en-tête de la classe Target
+#include <cmath>
+#include "utils/Problem.h"
+#include "utils/FloatVar.h"
+#include "utils/Target.h"
+
+// Fonction objectif : somme des carrés des éléments du vecteur
+std::vector<double> objective_function(const std::vector<double>& solution) {
+    double sum = 0.0;
+    for (double val : solution) {
+        sum += val * val;
+    }
+    return {sum}; // Retourne un vecteur pour gérer plusieurs objectifs
+}
 
 int main() {
-    try {
-        // Création d'une instance de Target avec des objectifs et des poids
-        std::vector<double> objectives = {10.0, 20.0, 30.0}; // Objectifs pour le target
-        std::vector<double> weights = {0.1, 0.3, 0.6}; // Poids pour le target
-        Target target(objectives, weights); // Création d'un objet Target
+    // Définir les bornes du problème (30 variables entre -10 et 10)
+    FloatVar bounds(std::vector<double>(30, -10.0), std::vector<double>(30, 10.0));
 
-        // Création d'une solution pour l'agent (par exemple une liste de doubles)
-        std::vector<double> solution = {1.0, 2.0, 3.0}; // Solution pour l'agent
+    // Définir le problème
+    Problem problem({bounds}, "min", objective_function);
 
-        // Création de l'agent avec la solution et le target
-        Agent agent(solution, target);
+    // Générer une solution
+    std::vector<double> solution = problem.generate_solution(true);
+    std::cout << "Solution générée : ";
+    for (double val : solution) std::cout << val << " ";
+    std::cout << std::endl;
 
-        // Affichage des informations sur l'agent
-        std::cout << "Solution de l'Agent : ";
-        for (const auto& s : agent.get_solution()) {
-            std::cout << s << " ";
-        }
-        std::cout << std::endl;
+    // Corriger la solution
+    std::vector<double> corrected_solution;
+    problem.correct_solution(solution);
+    std::cout << "Solution corrigée : ";
+    for (double val : corrected_solution) std::cout << val << " ";
+    std::cout << std::endl;
 
-        // Affichage des informations sur le target de l'agent
-        std::cout << "Objectifs du Target : ";
-        for (const auto& obj : agent.get_target().objectives()) {
-            std::cout << obj << " ";
-        }
-        std::cout << std::endl;
+    // Obtenir le Target (objectifs et poids)
+    Target target = problem.get_target(solution);
+    std::cout << "Objectifs du target : ";
+    for (double obj : target.objectives()) std::cout << obj << " ";
+    std::cout << std::endl;
 
-        std::cout << "Poids du Target : ";
-        for (const auto& w : agent.get_target().weights()) {
-            std::cout << w << " ";
-        }
-        std::cout << std::endl;
-
-        // Copie de l'agent
-        Agent copiedAgent = agent.copy();
-        std::cout << "Solution de l'Agent Copié : ";
-        for (const auto& s : copiedAgent.get_solution()) {
-            std::cout << s << " ";
-        }
-        std::cout << std::endl;
-
-        std::cout << "Objectifs du Target de l'Agent Copié : ";
-        for (const auto& obj : copiedAgent.get_target().objectives()) {
-            std::cout << obj << " ";
-        }
-        std::cout << std::endl;
-
-        std::cout << "Poids du Target de l'Agent Copié : ";
-        for (const auto& w : copiedAgent.get_target().weights()) {
-            std::cout << w << " ";
-        }
-        std::cout << std::endl;
-
-    } catch (const std::exception& e) {
-        std::cerr << "Erreur : " << e.what() << std::endl;
-    }
+    std::cout << "Poids du target : ";
+    for (double weight : target.weights()) std::cout << weight << " ";
+    std::cout << std::endl;
 
     return 0;
 }

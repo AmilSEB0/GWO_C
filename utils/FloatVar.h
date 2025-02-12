@@ -23,6 +23,7 @@ public:
 private:
     std::vector<double> lb, ub; // Bornes inférieure et supérieure
     int n_vars;
+    int seed;
 
     // Méthode pour définir les bornes
     void _set_bounds(const std::vector<double>& lb, const std::vector<double>& ub);

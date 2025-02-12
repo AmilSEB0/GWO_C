@@ -12,8 +12,9 @@ Target::Target(const std::vector<double>& objectives, const std::vector<double>&
 }
 
 // Constructeur de copie
-Target Target::copy() const {
-    return Target(_objectives, _weights);  // Retourne une copie de l'objet actuel
+Target* Target::copy() const {
+    Target* target = new Target(_objectives, _weights);  // Allocation dynamique d'une copie de l'objet actuel
+    return target;
 }
 
 // Getter pour les objectifs
