@@ -5,7 +5,7 @@
 #include "utils/Agent.h"
 
 Optimizer::Optimizer()
-    : epoch(0), pop_size(0), g_best(new Agent()), g_worst(nullptr), problem(nullptr) {
+    : epoch(0), pop_size(0), g_best(nullptr), g_worst(nullptr), problem(nullptr) {
     // Initialisation des vecteurs
     list_epoch_time.clear();
     list_global_best.clear();
@@ -34,6 +34,10 @@ void Optimizer::before_initialization(const std::vector<std::vector<double>>& st
 }
 
 void Optimizer::after_initialization() {
+    if (pop.empty()) {
+        throw std::runtime_error("Population is empty after initialization.");
+    }
+
     std::vector<double> list_fits;
     for (auto* agent : pop) {
         list_fits.push_back(agent->get_target().fitness());
@@ -58,7 +62,7 @@ void Optimizer::after_initialization() {
     }
 
     pop = sorted_pop;
-    g_best = pop[0];
+    g_best = pop.front();
     g_worst = pop.back();
 
     list_global_best.push_back(g_best->copy());
@@ -68,50 +72,41 @@ void Optimizer::after_initialization() {
 }
 
 void Optimizer::check_problem(Problem* problem) {
-    this->problem = problem;  pop.clear();
+    if (!problem) {
+        throw std::invalid_argument("Problem instance is null.");
+    }
+    this->problem = problem;
+    pop.clear();
     g_best = nullptr;
     g_worst = nullptr;
 }
 
-Agent* Optimizer::solve(Problem* problem, const std::vector<std::vector<double>>& starting_solutions,
-                       int seed) {
-    // Vérification et initialisation du problème
+Agent* Optimizer::solve(Problem* problem, const std::vector<std::vector<double>>& starting_solutions, int seed) {
     check_problem(problem);
 
-    // Appel de la méthode avant initialisation
     before_initialization(starting_solutions);
 
-    // Génération de la population si elle est vide
     if (pop.empty()) {
+        if (pop_size <= 0) {
+            throw std::runtime_error("Population size must be greater than zero.");
+        }
         pop = generate_population(pop_size);
     }
 
-    // Appel de la méthode après initialisation
     after_initialization();
 
-    // Boucle d'optimisation pour chaque époque
-    for (int epoch = 1; epoch <= epoch; ++epoch) {
-        // Appel de la méthode évolutive spécifique à la classe fille
-        evolve(epoch);
-
-        // Mise à jour de la meilleure solution globale (g_best)
+    for (int e = 1; e <= epoch; ++e) {
+        evolve(e);
         g_best = update_global_best_agent(pop);
 
-        // Optionnel : mesure du temps d'une époque (cette partie simule le comportement de time.perf_counter())
         auto start_time = std::chrono::high_resolution_clock::now();
-        // Calcul du temps écoulé pour l'époque
         auto end_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> duration = end_time - start_time;
         double time_epoch = duration.count();
 
-        // Suivi de l'optimisation pour l'époque courante
-        track_optimize_step(pop, epoch, time_epoch);
+        track_optimize_step(pop, e, time_epoch);
     }
 
-    // Suivi final du processus d'optimisation
-    track_optimize_process();
-
-    // Retourner l'agent globalement meilleur trouvé
     return g_best;
 }
 
@@ -313,6 +308,14 @@ Agent* Optimizer::update_global_best_agent(std::vector<Agent*>& pop, bool save) 
 
         return global_better;
     }
+}
+
+std::vector<double> Optimizer::generate_random_vector(int n_dims) {
+    std::vector<double> vec(n_dims);
+    for (int i = 0; i < n_dims; ++i) {
+        vec[i] = std::uniform_real_distribution<>(0.0, 1.0)(generator);
+    }
+    return vec;
 }
 
 void Optimizer::track_optimize_step(std::vector<Agent*>& pop, int epoch, double runtime) {

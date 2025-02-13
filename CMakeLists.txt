@@ -4,8 +4,6 @@ project(GWO_C)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(GWO_C main.cpp
-        GWO.h
-        GWO.cpp
         Optimizer.h
         Optimizer.cpp
         utils/Agent.h
@@ -15,4 +13,6 @@ add_executable(GWO_C main.cpp
         utils/FloatVar.h
         utils/FloatVar.cpp
         utils/Problem.h
-        utils/Problem.cpp)
+        utils/Problem.cpp
+        OriginalGWO.h
+        OriginalGWO.cpp)
