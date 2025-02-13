@@ -4,8 +4,8 @@
 #include "Optimizer.h"
 #include "utils/Agent.h"
 
-Optimizer::Optimizer()
-    : epoch(0), pop_size(0), g_best(nullptr), g_worst(nullptr), problem(nullptr) {
+Optimizer::Optimizer(int epoch, int pop_size)
+    : epoch(epoch), pop_size(pop_size), g_best(nullptr), g_worst(nullptr), problem(nullptr) {
     // Initialisation des vecteurs
     list_epoch_time.clear();
     list_global_best.clear();
@@ -87,11 +87,12 @@ Agent* Optimizer::solve(Problem* problem, const std::vector<std::vector<double>>
     before_initialization(starting_solutions);
 
     if (pop.empty()) {
-        if (pop_size <= 0) {
+        if (pop_size < 0) { // code modifier suprression de <=
             throw std::runtime_error("Population size must be greater than zero.");
         }
-        pop = generate_population(pop_size);
+        pop = generate_population(pop_size);  // Si pop_size est 0 ici, tu devrais avoir une erreur.
     }
+    //std::cout << "Fitness globale optimale: " << pop << std::endl;
 
     after_initialization();
 
@@ -316,6 +317,15 @@ std::vector<double> Optimizer::generate_random_vector(int n_dims) {
         vec[i] = std::uniform_real_distribution<>(0.0, 1.0)(generator);
     }
     return vec;
+}
+
+Agent* Optimizer::get_global_best() const {
+    if (this->list_global_best.empty()) {
+        throw std::runtime_error("No global best found. The optimizer has not run yet.");
+    }
+
+    // Retourne l'agent avec le meilleur fitness global enregistré
+    return this->list_global_best.back(); // Le dernier élément de la liste est le meilleur global
 }
 
 void Optimizer::track_optimize_step(std::vector<Agent*>& pop, int epoch, double runtime) {

@@ -15,8 +15,7 @@ public:
 
     ~OriginalGWO() override;
 
-    std::vector<double> generate_random_vector(int n_dims);
-
+    std::vector<double> generate_random_vector(int size, double min, double max);
 private:
     int epoch;
     int pop_size;

@@ -1,48 +1,59 @@
 #include <iostream>
 #include <vector>
-#include <cmath>
+#include "OriginalGWO.h"
 #include "utils/Problem.h"
 #include "utils/FloatVar.h"
-#include "utils/Target.h"
 
-// Fonction objectif : somme des carrés des éléments du vecteur
+// Fonction objectif : somme des carrés des éléments de la solution
 std::vector<double> objective_function(const std::vector<double>& solution) {
-    double sum = 0.0;
-    for (double val : solution) {
-        sum += val * val;
+    std::vector<double> result(1, 0.0);  // Valeur retournée pour la cible (fitness)
+    for (double value : solution) {
+        result[0] += value * value;
     }
-    return {sum}; // Retourne un vecteur pour gérer plusieurs objectifs
+    return result;
 }
 
 int main() {
-    // Définir les bornes du problème (30 variables entre -10 et 10)
-    FloatVar bounds(std::vector<double>(30, -10.0), std::vector<double>(30, 10.0));
+    // Définir les bornes du problème pour chaque dimension (par exemple, [-10, 10] pour chaque dimension)
+    int n_dims = 30;  // Nombre de dimensions
 
-    // Définir le problème
-    Problem problem({bounds}, "min", objective_function);
+    // Créer des vecteurs de bornes pour chaque dimension
+    std::vector<double> lb(n_dims, -10.0);  // Vecteur de bornes inférieures, -10 pour chaque dimension
+    std::vector<double> ub(n_dims, 10.0);   // Vecteur de bornes supérieures, 10 pour chaque dimension
 
-    // Générer une solution
-    std::vector<double> solution = problem.generate_solution(true);
-    std::cout << "Solution générée : ";
-    for (double val : solution) std::cout << val << " ";
+    // Créer un vecteur de variables FloatVar pour chaque dimension
+    std::vector<FloatVar> bounds;
+    for (int i = 0; i < n_dims; ++i) {
+        bounds.push_back(FloatVar({lb[i]}, {ub[i]}));  // Créer une variable pour chaque dimension avec ses propres bornes
+    }
+
+    // Créer un objet Problem
+    std::string minmax = "min";  // Minimisation
+    Problem problem(bounds, minmax, objective_function);
+
+    // Initialiser l'optimiseur GWO
+    int epoch = 1000;  // Nombre d'époques
+    int pop_size = 50;  // Taille de la population
+    OriginalGWO gwo(epoch, pop_size);
+
+    // Résoudre le problème avec GWO
+    Agent* g_best = gwo.solve(&problem);  // Résultat de la solution optimale
+
+    // Afficher la solution optimale et son fitness
+    std::cout << "Solution optimale: ";
+    for (double val : g_best->get_solution()) {
+        std::cout << val << " ";
+    }
     std::cout << std::endl;
+    std::cout << "Fitness: " << g_best->get_target().fitness() << std::endl;
 
-    // Corriger la solution
-    std::vector<double> corrected_solution;
-    problem.correct_solution(solution);
-    std::cout << "Solution corrigée : ";
-    for (double val : corrected_solution) std::cout << val << " ";
+    // Afficher les détails de la meilleure solution trouvée pendant l'optimisation
+    std::cout << "Solution globale optimale: ";
+    for (double val : gwo.get_global_best()->get_solution()) {
+        std::cout << val << " ";
+    }
     std::cout << std::endl;
-
-    // Obtenir le Target (objectifs et poids)
-    Target target = problem.get_target(solution);
-    std::cout << "Objectifs du target : ";
-    for (double obj : target.objectives()) std::cout << obj << " ";
-    std::cout << std::endl;
-
-    std::cout << "Poids du target : ";
-    for (double weight : target.weights()) std::cout << weight << " ";
-    std::cout << std::endl;
+    std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target().fitness() << std::endl;
 
     return 0;
 }

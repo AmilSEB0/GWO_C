@@ -17,14 +17,16 @@ class Optimizer {
 public:
 
     // Constructeur
-    Optimizer();
+    Optimizer(int epoch, int pop_size);
 
     // Méthodes principales
-    Agent* solve(Problem* problem, const std::vector<std::vector<double>>& starting_solutions = {}, int seed = 42);
+    Agent* solve(Problem* problem, const std::vector<std::vector<double>>& starting_solutions = {}, int seed = 0);
     // Mise à jour des solutions
     virtual void evolve(int epoch) = 0;
 
     virtual ~Optimizer() = default; // destructeur virtuel par défaut
+
+    Agent* get_global_best() const;
 
 protected:
     // Initialisation

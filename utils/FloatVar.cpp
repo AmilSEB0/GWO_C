@@ -4,13 +4,6 @@
 #include "FloatVar.h"
 #include <stdexcept>
 
-// Constructeur pour valeurs uniques
-FloatVar::FloatVar(double lb, double ub) {
-    std::vector<double> lb_vec = {lb};
-    std::vector<double> ub_vec = {ub};
-    _set_bounds(lb_vec, ub_vec);
-}
-
 // Constructeur pour tableaux de bornes
 FloatVar::FloatVar(const std::vector<double>& lb, const std::vector<double>& ub) {
     _set_bounds(lb, ub);

@@ -10,10 +10,7 @@
 class FloatVar {
 public:
     // Constructeur
-    FloatVar(double lb = -10.0, double ub = 10.0);
-
-    // Constructeur surchargé pour les tableaux de bornes
-    FloatVar(const std::vector<double>& lb, const std::vector<double>& ub);
+    FloatVar(const std::vector<double>& lb={-10.0}, const std::vector<double>& ub={10.0});
 
     // Accesseurs
     std::vector<double> get_lb() const;
