@@ -8,8 +8,6 @@ add_executable(GWO_C main.cpp
         Optimizer.cpp
         utils/Agent.h
         utils/Agent.cpp
-        utils/Target.h
-        utils/Target.cpp
         utils/Problem.h
         utils/Problem.cpp
         OriginalGWO.h

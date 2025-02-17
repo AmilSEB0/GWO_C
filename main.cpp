@@ -1,4 +1,4 @@
-/*#include <iostream>
+#include <iostream>
 #include <vector>
 #include "OriginalGWO.h"
 #include "utils/Problem.h"
@@ -38,7 +38,7 @@ int main() {
         std::cout << val << " ";
     }
     std::cout << std::endl;
-    std::cout << "Fitness: " << g_best->get_target().fitness() << std::endl;
+    std::cout << "Fitness: " << g_best->get_target() << std::endl;
 
     // Afficher les détails de la meilleure solution trouvée pendant l'optimisation
     std::cout << "Solution globale optimale: ";
@@ -46,12 +46,12 @@ int main() {
         std::cout << val << " ";
     }
     std::cout << std::endl;
-    std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target().fitness() << std::endl;
+    std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target() << std::endl;
 
     return 0;
-}*/
+}
 
-#include <iostream>
+/*#include <iostream>
 #include <vector>
 #include <fstream>
 #include <cmath>
@@ -105,7 +105,7 @@ void run_benchmark(int n_dims, const std::vector<std::vector<double>>& lb, const
         OriginalGWO gwo(epoch, pop_size);
         Agent* g_best = gwo.solve(&problem);  // Résultat de la solution optimale
 
-        double fitness = g_best->get_target().fitness();
+        double fitness = g_best->get_target();
         total_fitness += fitness;
         fitness_squared_sum += fitness * fitness;
 
@@ -156,4 +156,4 @@ int main() {
     std::cout << "Benchmarking complet. Les résultats ont été enregistrés dans les fichiers CSV." << std::endl;
 
     return 0;
-}
+}*/

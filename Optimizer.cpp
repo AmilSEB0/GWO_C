@@ -71,7 +71,7 @@ void Optimizer::after_initialization() {
 
     std::vector<double> list_fits;
     for (auto* agent : pop) {
-        list_fits.push_back(agent->get_target().fitness());
+        list_fits.push_back(agent->get_target());
     }
 
     std::vector<size_t> indices(list_fits.size());
@@ -155,7 +155,7 @@ Agent* Optimizer::generate_empty_agent(const std::vector<double>& solution) {
     std::vector<double> agent_solution = solution.empty() ? problem->generate_solution(true) : solution;
 
     // Créer un nouvel agent avec la solution générée et retourner un pointeur vers cet agent
-    return new Agent(agent_solution, problem->get_target(agent_solution));
+    return new Agent(agent_solution, problem->get_fitness(agent_solution));
 }
 
 Agent* Optimizer::generate_agent(const std::vector<double>& solution) {
@@ -237,7 +237,7 @@ std::vector<double> Optimizer::generate_solution(bool encoded) {
     return solution;
 }
 
-Target Optimizer::get_target(const std::vector<double>& solution, bool counted) {
+double Optimizer::get_target(const std::vector<double>& solution, bool counted) {
     /**
      * Obtenez la valeur cible (target).
      *
@@ -248,7 +248,7 @@ Target Optimizer::get_target(const std::vector<double>& solution, bool counted) 
      * Retourne :
      *     La valeur cible (Target).
      */
-    return problem->get_target(solution);  // Appel à la méthode get_target de la classe Problem.
+    return problem->get_fitness(solution);  // Appel à la méthode get_target de la classe Problem.
 }
 
 Agent* Optimizer::get_better_agent(Agent* agent_x, Agent* agent_y, const std::string& minmax , bool reverse) {
@@ -275,9 +275,9 @@ Agent* Optimizer::get_better_agent(Agent* agent_x, Agent* agent_y, const std::st
 
     // Comparer les agents en fonction de leur "fitness"
     if (idx == 0) {  // Min (Chercher le meilleur "fitness" minimum)
-        return (agent_x->get_target().fitness() < agent_y->get_target().fitness()) ? agent_x : agent_y;
+        return (agent_x->get_target() < agent_y->get_target()) ? agent_x : agent_y;
     } else {  // Max (Chercher le meilleur "fitness" maximum)
-        return (agent_x->get_target().fitness() < agent_y->get_target().fitness()) ? agent_y : agent_x;
+        return (agent_x->get_target() < agent_y->get_target()) ? agent_y : agent_x;
     }
 }
 
@@ -285,7 +285,7 @@ Agent* Optimizer::update_global_best_agent(std::vector<Agent*>& pop, bool save) 
     // Tri de la population en fonction de la fitness
     std::vector<double> list_fits;
     for (auto& agent : pop) {
-        list_fits.push_back(agent->get_target().fitness());
+        list_fits.push_back(agent->get_target());
     }
 
     // Tri des indices selon la fitness (croissante par défaut)
@@ -362,7 +362,7 @@ Agent* Optimizer::get_global_best() const {
 void Optimizer::track_optimize_step(std::vector<Agent*>& pop, int epoch, double runtime) {
     // Ajouter les données historiques
     this->list_epoch_time.push_back(runtime);
-    this->list_global_best_fit.push_back(this->list_global_best.back()->get_target().fitness());
+    this->list_global_best_fit.push_back(this->list_global_best.back()->get_target());
     this->list_current_best_fit.push_back(this->list_current_best.back());
 
     // Calcul de la diversité (exploration et exploitation)
@@ -401,8 +401,8 @@ void Optimizer::track_optimize_step(std::vector<Agent*>& pop, int epoch, double 
 
     // Affichage de l'état de l'itération
     std::cout << ">>> Epoch: " << epoch
-              << ", Current best: " << this->list_current_best.back()->get_target().fitness()
-              << ", Global best: " << this->list_global_best.back()->get_target().fitness()
+              << ", Current best: " << this->list_current_best.back()->get_target()
+              << ", Global best: " << this->list_global_best.back()->get_target()
               << ", Runtime: " << runtime << " seconds" << std::endl;
 }
 

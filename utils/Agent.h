@@ -6,27 +6,27 @@
 #define AGENT_H
 
 #include <vector>
-#include "Target.h"
 
 class Agent {
 public:
-    Agent(const std::vector<double>& solution, const Target& target);
-    Agent();
+    // Constructeur avec solution et fitness
+    Agent(const std::vector<double>& solution, double fitness);
+    Agent();  // Constructeur par défaut
 
     // Méthode de copie
     Agent* copy() const;
 
-    // Accesseurs (Getters)
+    // Getters
     std::vector<double> get_solution() const;
-    Target get_target() const;
+    double get_target() const;
 
-    // Mutateurs (Setters)
+    // Setters
     void set_solution(const std::vector<double>& solution);
-    void set_target(const Target& target);
+    void set_target(double fitness);
 
 private:
     std::vector<double> solution;
-    Target target;
+    double fitness;  // anciennement target
 };
 
 #endif // AGENT_H

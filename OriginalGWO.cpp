@@ -42,7 +42,7 @@ void OriginalGWO::evolve(int epoch) {
     // Tri de la population selon la fitness
     std::vector<double> list_fits;
     for (auto& agent : pop) {
-        list_fits.push_back(agent->get_target().fitness());
+        list_fits.push_back(agent->get_target());
     }
 
     std::vector<int> indices(list_fits.size());
@@ -105,7 +105,7 @@ void OriginalGWO::evolve(int epoch) {
         pop_new.push_back(agent);
 
         // Mise à jour de la cible de l'agent
-        agent->get_target() = get_target(pos_new);
+        agent->set_target(get_target(pos_new));
 
         // Mise à jour de la population avec l'agent amélioré
         pop[idx] = get_better_agent(agent, pop[idx], problem->getMinMax());

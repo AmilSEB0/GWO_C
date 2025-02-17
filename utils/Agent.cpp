@@ -3,17 +3,16 @@
 //
 #include "Agent.h"
 
-// Constructeur avec solution et target
-Agent::Agent(const std::vector<double>& solution, const Target& target)
-    : solution(solution), target(target) {}
+// Constructeur avec solution et fitness
+Agent::Agent(const std::vector<double>& solution, double fitness)
+    : solution(solution), fitness(fitness) {}
 
 // Constructeur
-Agent::Agent(){}
+Agent::Agent() : fitness(0.0) {}
 
 // Méthode de copie
 Agent* Agent::copy() const {
     Agent* agent = new Agent(*this); // Allocation dynamique d'une copie de l'instance actuelle
-    // Ajout d'autres attributs si nécessaire (non précisés dans la classe d'origine)
     return agent;
 }
 
@@ -22,8 +21,8 @@ std::vector<double> Agent::get_solution() const {
     return solution;
 }
 
-Target Agent::get_target() const {
-    return target;
+double Agent::get_target() const {
+    return fitness;
 }
 
 // Setters
@@ -31,6 +30,7 @@ void Agent::set_solution(const std::vector<double>& solution) {
     this->solution = solution;
 }
 
-void Agent::set_target(const Target& target) {
-    this->target = target;
+void Agent::set_target(double fitness) {
+    this->fitness = fitness;
 }
+

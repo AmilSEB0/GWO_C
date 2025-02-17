@@ -11,7 +11,6 @@
 #include <type_traits>
 #include "utils/Agent.h"
 #include "utils/Problem.h"
-#include "utils/Target.h"
 
 class Optimizer {
 public:
@@ -47,7 +46,7 @@ protected:
 
     // Utilitaires
     std::vector<double> correct_solution(const std::vector<double>& solution);
-    Target get_target(const std::vector<double>& solution, bool counted = true);
+    double get_target(const std::vector<double>& solution, bool counted = true);
     static Agent* get_better_agent(Agent* agent_x, Agent* agent_y, const std::string& minmax = "min", bool reverse = false);
 
     std::vector<double> generate_random_vector(int n_dims);

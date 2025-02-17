@@ -15,7 +15,6 @@ void Problem::set_bounds(const std::vector<std::vector<double>>& lb, const std::
     lb_ = lb;
     ub_ = ub;
 
-    // Applatir les vecteurs lb et ub pour faciliter l'accès aux bornes dans d'autres méthodes
     lb_flat_.clear();
     ub_flat_.clear();
 
@@ -75,7 +74,14 @@ std::string Problem::getMinMax() const {
     return minmax_;
 }
 
-Target Problem::get_target(const std::vector<double>& solution) const {
+double Problem::get_fitness(const std::vector<double>& solution) const {
     std::vector<double> objectives = obj_func_(solution);
-    return Target(objectives, obj_weights_);
+    double fitness = 0.0;
+
+    // Calculer la fitness en utilisant les poids et les objectifs
+    for (size_t i = 0; i < objectives.size(); ++i) {
+        fitness += objectives[i] * obj_weights_[i];  // Produit scalaire des objectifs et des poids
+    }
+
+    return fitness;
 }
