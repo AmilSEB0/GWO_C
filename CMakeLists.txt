@@ -10,8 +10,6 @@ add_executable(GWO_C main.cpp
         utils/Agent.cpp
         utils/Target.h
         utils/Target.cpp
-        utils/FloatVar.h
-        utils/FloatVar.cpp
         utils/Problem.h
         utils/Problem.cpp
         OriginalGWO.h

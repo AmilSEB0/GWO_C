@@ -17,6 +17,37 @@ Optimizer::Optimizer(int epoch, int pop_size)
     list_diversity.clear();
 }
 
+Optimizer::~Optimizer() {
+    // Libérer la mémoire allouée pour chaque agent dans la population
+    for (Agent* agent : pop) {
+        delete agent;  // Libération de chaque agent
+    }
+
+
+    pop.clear();  // Nettoyer le vecteur après libération de la mémoire
+
+    // Libérer les agents dans les autres listes
+
+    list_global_best.clear();
+
+
+    list_current_best.clear();
+
+
+    list_global_worst.clear();
+
+    
+    list_current_worst.clear();
+
+    // Nettoyer les autres ressources
+    list_epoch_time.clear();
+    list_global_best_fit.clear();
+    list_current_best_fit.clear();
+    list_diversity.clear();
+    list_exploitation.clear();
+    list_exploration.clear();
+}
+
 void Optimizer::before_initialization(const std::vector<std::vector<double>>& starting_solutions) {
     if (starting_solutions.empty()) {
         return; // Pas de traitement si aucune solution initiale

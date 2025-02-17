@@ -4,31 +4,55 @@
 #include <random>
 #include <cmath>
 
-Problem::Problem(const std::vector<FloatVar>& bounds, const std::string& minmax,
+Problem::Problem(const std::vector<std::vector<double>>& lb, const std::vector<std::vector<double>>& ub, const std::string& minmax,
                  const std::function<std::vector<double>(const std::vector<double>&)>& obj_func)
-    : bounds_(bounds), minmax_(minmax), obj_func_(obj_func) {
-    set_bounds(bounds);
+    : lb_(lb), ub_(ub), minmax_(minmax), obj_func_(obj_func) {
+    set_bounds(lb, ub);
     set_functions();
 }
 
-void Problem::set_bounds(const std::vector<FloatVar>& bounds) {
-    bounds_ = bounds;
-    lb_.clear();
-    ub_.clear();
+void Problem::set_bounds(const std::vector<std::vector<double>>& lb, const std::vector<std::vector<double>>& ub) {
+    lb_ = lb;
+    ub_ = ub;
 
-    for (const auto& bound : bounds_) {
-        const auto& lb_bound = bound.get_lb();
-        const auto& ub_bound = bound.get_ub();
-        lb_.insert(lb_.end(), lb_bound.begin(), lb_bound.end());
-        ub_.insert(ub_.end(), ub_bound.begin(), ub_bound.end());
+    // Applatir les vecteurs lb et ub pour faciliter l'accès aux bornes dans d'autres méthodes
+    lb_flat_.clear();
+    ub_flat_.clear();
+
+    for (size_t i = 0; i < lb_.size(); ++i) {
+        lb_flat_.insert(lb_flat_.end(), lb_[i].begin(), lb_[i].end());
+        ub_flat_.insert(ub_flat_.end(), ub_[i].begin(), ub_[i].end());
     }
 }
 
-void Problem::set_seed(int seed) {
-    this->seed = seed;
-    /*for (size_t idx = 0; idx < bounds_.size(); ++idx) {
-        bounds_[idx].seed = seed;
-    }*/
+std::vector<double> Problem::correct_solution(const std::vector<double>& x) const {
+    std::vector<double> x_new;
+    size_t n_vars = 0;
+
+    for (size_t i = 0; i < lb_.size(); ++i) {
+        for (size_t j = 0; j < lb_[i].size(); ++j) {
+            double corrected_value = std::clamp(x[n_vars + j], lb_[i][j], ub_[i][j]);
+            x_new.push_back(corrected_value);
+        }
+        n_vars += lb_[i].size();
+    }
+
+    return x_new; // Solution corrigée
+}
+
+std::vector<double> Problem::generate_solution(bool encoded) {
+    std::vector<double> x;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    for (size_t i = 0; i < lb_.size(); ++i) {
+        for (size_t j = 0; j < lb_[i].size(); ++j) {
+            std::uniform_real_distribution<> dis(lb_[i][j], ub_[i][j]);
+            x.push_back(dis(gen));
+        }
+    }
+
+    return x;  // Retourner la solution générée
 }
 
 void Problem::set_functions() {
@@ -49,38 +73,6 @@ size_t Problem::getNDims() const {
 
 std::string Problem::getMinMax() const {
     return minmax_;
-}
-
-std::vector<double> Problem::correct_solution(const std::vector<double>& x) const {
-    std::vector<double> x_new;
-    size_t n_vars = 0;
-
-    for (const auto& var : bounds_) {
-        // Pour chaque sous-ensemble de x, on applique std::clamp pour le limiter entre les bornes
-        size_t var_n_vars = var.get_n_vars();
-        for (size_t i = 0; i < var_n_vars; ++i) {
-            double corrected_value = std::clamp(x[n_vars + i], var.get_lb()[i], var.get_ub()[i]);
-            x_new.push_back(corrected_value);
-        }
-        n_vars += var_n_vars;
-    }
-
-    return x_new; // Solution corrigée
-}
-std::vector<double> Problem::generate_solution(bool encoded) {
-    std::vector<double> x;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    // Logique pour générer la solution...
-    for (const auto& var : bounds_) {
-        for (size_t i = 0; i < var.get_n_vars(); ++i) {
-            std::uniform_real_distribution<> dis(var.get_lb()[i], var.get_ub()[i]);
-            x.push_back(dis(gen));
-        }
-    }
-
-    return x;  // Retourner la solution générée
 }
 
 Target Problem::get_target(const std::vector<double>& solution) const {

@@ -1,7 +1,6 @@
 #ifndef PROBLEM_H
 #define PROBLEM_H
 
-#include "FloatVar.h"
 #include "Target.h"
 #include <vector>
 #include <functional>
@@ -12,10 +11,10 @@
 
 class Problem {
 public:
-    Problem(const std::vector<FloatVar>& bounds, const std::string& minmax,
+    Problem(const std::vector<std::vector<double>>& lb, const std::vector<std::vector<double>>& ub, const std::string& minmax,
             const std::function<std::vector<double>(const std::vector<double>&)>& obj_func);
 
-    void set_bounds(const std::vector<FloatVar>& bounds);
+    void set_bounds(const std::vector<std::vector<double>>& lb, const std::vector<std::vector<double>>& ub);
     void set_seed(int seed);
     std::vector<double> correct_solution(const std::vector<double>& x) const;
     std::vector<double> generate_solution(bool encoded = true);
@@ -26,9 +25,10 @@ public:
 private:
     void set_functions();
 
-    std::vector<FloatVar> bounds_;
-    std::vector<double> lb_;
-    std::vector<double> ub_;
+    std::vector<std::vector<double>> lb_;  // Liste des bornes inférieures pour chaque dimension
+    std::vector<std::vector<double>> ub_;  // Liste des bornes supérieures pour chaque dimension
+    std::vector<double> lb_flat_;  // Vecteur aplati des bornes inférieures
+    std::vector<double> ub_flat_;  // Vecteur aplati des bornes supérieures
     std::string minmax_;
     std::function<std::vector<double>(const std::vector<double>&)> obj_func_;
     std::vector<double> obj_weights_;

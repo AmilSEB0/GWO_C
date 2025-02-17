@@ -24,7 +24,7 @@ public:
     // Mise à jour des solutions
     virtual void evolve(int epoch) = 0;
 
-    virtual ~Optimizer() = default; // destructeur virtuel par défaut
+    virtual ~Optimizer(); // destructeur virtuel par défaut
 
     Agent* get_global_best() const;
 
