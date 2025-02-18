@@ -1,19 +1,17 @@
-//
-// Created by amil on 06/02/25.
-//
 #include "Agent.h"
+#include <memory>  // Ajout pour shared_ptr
 
 // Constructeur avec solution et fitness
 Agent::Agent(const std::vector<double>& solution, double fitness)
     : solution(solution), fitness(fitness) {}
 
-// Constructeur
+// Constructeur par défaut
 Agent::Agent() : fitness(0.0) {}
 
 // Méthode de copie
-Agent* Agent::copy() const {
-    Agent* agent = new Agent(*this); // Allocation dynamique d'une copie de l'instance actuelle
-    return agent;
+std::shared_ptr<Agent> Agent::copy() const {
+    // Retourne un shared_ptr pointant vers une copie de l'instance actuelle
+    return std::make_shared<Agent>(*this);  // Utilisation de make_shared pour la gestion automatique de la mémoire
 }
 
 // Getters

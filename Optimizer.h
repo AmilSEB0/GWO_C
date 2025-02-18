@@ -1,7 +1,9 @@
 #ifndef OPTIMIZER_H
 #define OPTIMIZER_H
-
+#include <memory>
 #include <vector>
+#include "utils/Agent.h"
+#include "utils/Problem.h"
 #include <string>
 #include <random>
 #include <functional>
@@ -9,70 +11,52 @@
 #include <chrono>
 #include <map>
 #include <type_traits>
-#include "utils/Agent.h"
-#include "utils/Problem.h"
 
 class Optimizer {
 public:
-
     // Constructeur
     Optimizer(int epoch, int pop_size);
 
     // Méthodes principales
-    Agent* solve(Problem* problem, const std::vector<std::vector<double>>& starting_solutions = {}, int seed = 0);
-    // Mise à jour des solutions
+    std::shared_ptr<Agent> solve(Problem* problem, const std::vector<std::vector<double>>& starting_solutions = {}, int seed = 0);
     virtual void evolve(int epoch) = 0;
 
-    virtual ~Optimizer(); // destructeur virtuel par défaut
+    virtual ~Optimizer();
 
-    Agent* get_global_best() const;
+    std::shared_ptr<Agent> get_global_best() const;
 
 protected:
-    // Initialisation
     void before_initialization(const std::vector<std::vector<double>>& starting_solutions = {});
     void after_initialization();
     void check_problem(Problem* problem);
+    std::shared_ptr<Agent> generate_empty_agent(const std::vector<double>& solution = {});
+    std::shared_ptr<Agent> generate_agent(const std::vector<double>& solution = {});
+    std::vector<std::shared_ptr<Agent>> generate_population(int pop_size = 0);
+    std::shared_ptr<Agent> update_global_best_agent(std::vector<std::shared_ptr<Agent>>& pop, bool save = true);
 
-    // Génération des agents et de la population
-    Agent* generate_empty_agent(const std::vector<double>& solution = {});
-    Agent* generate_agent(const std::vector<double>& solution = {});
-    std::vector<Agent*> generate_population(int pop_size = 0);
-
-    // Génération des solutions optimisées
-    std::vector<double> generate_solution(bool encoded);  // Déclaration de la méthode
-
-    // Optimisation et suivi
-    Agent* update_global_best_agent(std::vector<Agent*>& pop, bool save = true);
-
-    // Utilitaires
     std::vector<double> correct_solution(const std::vector<double>& solution);
     double get_target(const std::vector<double>& solution, bool counted = true);
-    static Agent* get_better_agent(Agent* agent_x, Agent* agent_y, const std::string& minmax = "min", bool reverse = false);
+    static std::shared_ptr<Agent> get_better_agent(std::shared_ptr<Agent> agent_x, std::shared_ptr<Agent> agent_y, const std::string& minmax = "min", bool reverse = false);
 
     std::vector<double> generate_random_vector(int n_dims);
 
-    // Suivi du processus
-    void track_optimize_step(std::vector<Agent*>& pop, int epoch, double runtime);
-    void track_optimize_process();
-    std::vector<Agent*> pop;
+    void track_optimize_step(std::vector<std::shared_ptr<Agent>>& pop, int epoch, double runtime);
+
+    std::vector<std::shared_ptr<Agent>> pop;
     Problem* problem;
+
 private:
-    // Variables membres
-    int epoch, pop_size;
-    Agent* g_best, *g_worst;
-
-    // Historique de la performance
+    int epoch;
+    int pop_size;
+    std::shared_ptr<Agent> g_best;
+    std::shared_ptr<Agent> g_worst;
+    std::vector<std::shared_ptr<Agent>> list_global_best;
+    std::vector<std::shared_ptr<Agent>> list_current_best;
+    std::vector<std::shared_ptr<Agent>> list_global_worst;
+    std::vector<std::shared_ptr<Agent>> list_current_worst;
     std::vector<double> list_epoch_time;
-    std::vector<Agent*> list_global_best;
-    std::vector<Agent*> list_current_best;
-    std::vector<Agent*> list_global_worst;
-    std::vector<Agent*> list_current_worst;
     std::vector<double> list_global_best_fit;
-    std::vector<Agent*> list_current_best_fit;
+    std::vector<std::shared_ptr<Agent>> list_current_best_fit;
     std::vector<double> list_diversity;
-    std::vector<double> list_exploitation;
-    std::vector<double> list_exploration;
-
-    std::mt19937 generator; // Générateur de nombres aléatoires
 };
 #endif // OPTIMIZER_H

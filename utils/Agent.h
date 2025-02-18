@@ -1,11 +1,8 @@
-//
-// Created by amil on 06/02/25.
-//
-
 #ifndef AGENT_H
 #define AGENT_H
 
 #include <vector>
+#include <memory>  // Ajout pour shared_ptr
 
 class Agent {
 public:
@@ -14,7 +11,7 @@ public:
     Agent();  // Constructeur par défaut
 
     // Méthode de copie
-    Agent* copy() const;
+    std::shared_ptr<Agent> copy() const;  // Retourne un shared_ptr
 
     // Getters
     std::vector<double> get_solution() const;

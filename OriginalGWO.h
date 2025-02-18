@@ -1,11 +1,9 @@
-//
-// Created by amil on 12/02/25.
-//
 #ifndef ORIGINAL_GWO_H
 #define ORIGINAL_GWO_H
 
 #include "Optimizer.h"
 #include <vector>
+#include <memory>
 
 class OriginalGWO : public Optimizer {
 public:

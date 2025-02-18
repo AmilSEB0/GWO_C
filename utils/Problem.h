@@ -2,6 +2,7 @@
 #define PROBLEM_H
 #include <vector>
 #include <functional>
+#include <memory>  // Nécessaire pour std::shared_ptr
 
 class Problem {
 public:

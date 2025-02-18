@@ -1,57 +1,57 @@
+// #include <iostream>
+// #include <vector>
+// #include "OriginalGWO.h"
+// #include "utils/Problem.h"
+
+// // Fonction objectif : somme des carrés des éléments de la solution
+// std::vector<double> objective_function(const std::vector<double>& solution) {
+//     std::vector<double> result(1, 0.0);  // Valeur retournée pour la cible (fitness)
+//     for (double value : solution) {
+//         result[0] += value * value;
+//     }
+//     return result;
+// }
+
+// int main() {
+//     // Définir les bornes du problème pour chaque dimension (par exemple, [-10, 10] pour chaque dimension)
+//     int n_dims = 30;  // Nombre de dimensions
+
+//     // Créer des vecteurs de bornes pour chaque dimension
+//     std::vector<std::vector<double>> lb(n_dims, std::vector<double>(1, -10.0));  // Vecteur de bornes inférieures, -10 pour chaque dimension
+//     std::vector<std::vector<double>> ub(n_dims, std::vector<double>(1, 10.0));   // Vecteur de bornes supérieures, 10 pour chaque dimension
+
+//     // Créer un objet Problem
+//     std::string minmax = "min";  // Minimisation
+//     Problem problem(lb, ub, minmax, objective_function);
+
+//     // Initialiser l'optimiseur GWO
+//     int epoch = 1000;  // Nombre d'époques
+//     int pop_size = 50;  // Taille de la population
+//     OriginalGWO gwo(epoch, pop_size);
+
+//     // Résoudre le problème avec GWO
+//     std::shared_ptr<Agent> g_best = gwo.solve(&problem);  // Résultat de la solution optimale
+
+//     // Afficher la solution optimale et son fitness
+//     std::cout << "Solution optimale: ";
+//     for (double val : g_best->get_solution()) {
+//         std::cout << val << " ";
+//     }
+//     std::cout << std::endl;
+//     std::cout << "Fitness: " << g_best->get_target() << std::endl;
+
+//     // Afficher les détails de la meilleure solution trouvée pendant l'optimisation
+//     std::cout << "Solution globale optimale: ";
+//     for (double val : gwo.get_global_best()->get_solution()) {
+//         std::cout << val << " ";
+//     }
+//     std::cout << std::endl;
+//     std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target() << std::endl;
+
+//     return 0;
+// }
+
 #include <iostream>
-#include <vector>
-#include "OriginalGWO.h"
-#include "utils/Problem.h"
-
-// Fonction objectif : somme des carrés des éléments de la solution
-std::vector<double> objective_function(const std::vector<double>& solution) {
-    std::vector<double> result(1, 0.0);  // Valeur retournée pour la cible (fitness)
-    for (double value : solution) {
-        result[0] += value * value;
-    }
-    return result;
-}
-
-int main() {
-    // Définir les bornes du problème pour chaque dimension (par exemple, [-10, 10] pour chaque dimension)
-    int n_dims = 30;  // Nombre de dimensions
-
-    // Créer des vecteurs de bornes pour chaque dimension
-    std::vector<std::vector<double>> lb(n_dims, std::vector<double>(1, -10.0));  // Vecteur de bornes inférieures, -10 pour chaque dimension
-    std::vector<std::vector<double>> ub(n_dims, std::vector<double>(1, 10.0));   // Vecteur de bornes supérieures, 10 pour chaque dimension
-
-    // Créer un objet Problem
-    std::string minmax = "min";  // Minimisation
-    Problem problem(lb, ub, minmax, objective_function);
-
-    // Initialiser l'optimiseur GWO
-    int epoch = 1000;  // Nombre d'époques
-    int pop_size = 50;  // Taille de la population
-    OriginalGWO gwo(epoch, pop_size);
-
-    // Résoudre le problème avec GWO
-    Agent* g_best = gwo.solve(&problem);  // Résultat de la solution optimale
-
-    // Afficher la solution optimale et son fitness
-    std::cout << "Solution optimale: ";
-    for (double val : g_best->get_solution()) {
-        std::cout << val << " ";
-    }
-    std::cout << std::endl;
-    std::cout << "Fitness: " << g_best->get_target() << std::endl;
-
-    // Afficher les détails de la meilleure solution trouvée pendant l'optimisation
-    std::cout << "Solution globale optimale: ";
-    for (double val : gwo.get_global_best()->get_solution()) {
-        std::cout << val << " ";
-    }
-    std::cout << std::endl;
-    std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target() << std::endl;
-
-    return 0;
-}
-
-/*#include <iostream>
 #include <vector>
 #include <fstream>
 #include <cmath>
@@ -103,7 +103,7 @@ void run_benchmark(int n_dims, const std::vector<std::vector<double>>& lb, const
 
         // Initialiser l'optimiseur GWO
         OriginalGWO gwo(epoch, pop_size);
-        Agent* g_best = gwo.solve(&problem);  // Résultat de la solution optimale
+        std::shared_ptr<Agent> g_best = gwo.solve(&problem);  // Résultat de la solution optimale
 
         double fitness = g_best->get_target();
         total_fitness += fitness;
@@ -156,4 +156,4 @@ int main() {
     std::cout << "Benchmarking complet. Les résultats ont été enregistrés dans les fichiers CSV." << std::endl;
 
     return 0;
-}*/
+}

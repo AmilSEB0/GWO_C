@@ -1,6 +1,3 @@
-//
-// Created by amil on 12/02/25.
-//
 #include "OriginalGWO.h"
 #include "Optimizer.h"
 #include <algorithm>
@@ -36,8 +33,8 @@ std::vector<double> OriginalGWO::generate_random_vector(int size, double min, do
 
  // Evolve method (equivalent to the Python version)
 void OriginalGWO::evolve(int epoch) {
-    // linearly decreased from 2 to 0
-    double a = 2.0 - 2.0 * epoch / this->epoch;
+    // Linearly decreased from 2 to 0
+    double a = 2.0 - 2.0 * epoch / this->epoch;  // Identique au code Python
 
     // Tri de la population selon la fitness
     std::vector<double> list_fits;
@@ -56,25 +53,37 @@ void OriginalGWO::evolve(int epoch) {
         std::reverse(indices.begin(), indices.end()); // Inverser si l'optimisation est en maximisation
     }
 
-    // Recréer la population triée
-    std::vector<Agent*> sorted_pop;
+    // Recréer la population triée avec des shared_ptr
+    std::vector<std::shared_ptr<Agent>> sorted_pop;
     for (auto idx : indices) {
         sorted_pop.push_back(pop[idx]);
     }
     pop = sorted_pop;
 
     // Récupérer les 3 meilleurs agents
-    std::vector<Agent*> list_best(pop.begin(), pop.begin() + 3);
+    std::vector<std::shared_ptr<Agent>> list_best(pop.begin(), pop.begin() + 3);
 
     // Initialisation de la nouvelle population
-    std::vector<Agent*> pop_new;
+    std::vector<std::shared_ptr<Agent>> pop_new;
 
     // Générer des nouveaux agents pour la population
     for (int idx = 0; idx < pop_size; ++idx) {
         // Générer des vecteurs aléatoires pour A1, A2, A3, C1, C2, C3
         std::vector<double> A1 = generate_random_vector(problem->getNDims(), -1.0, 1.0);
+        for (auto& val : A1) {
+            val *= a;  // Multiplication élément par élément
+        }
+
         std::vector<double> A2 = generate_random_vector(problem->getNDims(), -1.0, 1.0);
+        for (auto& val : A2) {
+            val *= a;
+        }
+
         std::vector<double> A3 = generate_random_vector(problem->getNDims(), -1.0, 1.0);
+        for (auto& val : A3) {
+            val *= a;
+        }
+
         std::vector<double> C1 = generate_random_vector(problem->getNDims(), 0.0, 2.0);
         std::vector<double> C2 = generate_random_vector(problem->getNDims(), 0.0, 2.0);
         std::vector<double> C3 = generate_random_vector(problem->getNDims(), 0.0, 2.0);
@@ -101,7 +110,7 @@ void OriginalGWO::evolve(int epoch) {
         pos_new = correct_solution(pos_new);
 
         // Générer un agent avec la nouvelle position
-        Agent* agent = generate_empty_agent(pos_new);
+        auto agent = generate_empty_agent(pos_new); // Utilisation de shared_ptr
         pop_new.push_back(agent);
 
         // Mise à jour de la cible de l'agent
