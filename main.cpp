@@ -1,4 +1,5 @@
-/*#include <iostream>
+/*
+#include <iostream>
 #include <vector>
 #include "OriginalGWO.h"
 #include "utils/Problem.h"
@@ -11,7 +12,8 @@ std::vector<double> objective_function(const std::vector<double>& solution) {
     }
     return result;
 
-    /*const double A = 10;
+    /*
+    const double A = 10;
     double sum = 0;
     for (size_t i = 0; i < solution.size(); ++i) {
         sum += std::pow(solution[i], 2) - A * std::cos(2 * M_PI * solution[i]);
@@ -56,13 +58,15 @@ int main() {
     std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target() << std::endl;
 
     return 0;
-}*/
+}
+*/
 
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <cmath>
 #include <string>
+#include <chrono>  // Ajouter pour mesurer le temps d'exécution
 #include "OriginalGWO.h"
 #include "utils/Problem.h"
 
@@ -102,6 +106,7 @@ std::vector<double> ackley_objective(const std::vector<double>& solution) {
 void run_benchmark(int n_dims, const std::vector<std::vector<double>>& lb, const std::vector<std::vector<double>>& ub, const std::string& function_name, int epoch, int pop_size, int n_runs, std::ofstream& execution_file, std::ofstream& stats_file) {
     double total_fitness = 0.0;
     double fitness_squared_sum = 0.0;
+    double total_time = 0.0; // Pour le calcul du temps total
 
     for (int run_idx = 0; run_idx < n_runs; ++run_idx) {
         // Créer un objet Problem avec la fonction objectif appropriée
@@ -110,33 +115,47 @@ void run_benchmark(int n_dims, const std::vector<std::vector<double>>& lb, const
 
         // Initialiser l'optimiseur GWO
         OriginalGWO gwo(epoch, pop_size);
+
+        // Mesurer le temps de l'exécution
+        auto start_time = std::chrono::high_resolution_clock::now();  // Temps avant l'exécution
+
         std::shared_ptr<Agent> g_best = gwo.solve(&problem);  // Résultat de la solution optimale
+
+        auto end_time = std::chrono::high_resolution_clock::now();  // Temps après l'exécution
+        std::chrono::duration<double> execution_duration = end_time - start_time;  // Durée d'exécution en secondes
 
         double fitness = g_best->get_target();
         total_fitness += fitness;
         fitness_squared_sum += fitness * fitness;
 
-        // Enregistrer la fitness de cette exécution dans le fichier CSV d'exécution
-        execution_file << function_name << "," << n_dims << "," << run_idx + 1 << "," << fitness << std::endl;
+        // Ajouter le temps d'exécution pour cette exécution
+        total_time += execution_duration.count();
+
+        // Enregistrer la fitness et le temps d'exécution de cette exécution dans le fichier CSV d'exécution
+        execution_file << function_name << "," << n_dims << "," << run_idx + 1 << "," << fitness << "," << execution_duration.count() << std::endl;
     }
 
     // Calculer la moyenne et l'écart-type pour cette fonction et dimension
     double mean_fitness = total_fitness / n_runs;
-    double variance = (fitness_squared_sum / n_runs) - (mean_fitness * mean_fitness);
-    double std_fitness = std::sqrt(variance);
+    double variance_fitness = (fitness_squared_sum / n_runs) - (mean_fitness * mean_fitness);
+    double std_fitness = std::sqrt(variance_fitness);
+
+    double mean_time = total_time / n_runs;  // Calcul de la moyenne du temps d'exécution
+    double variance_time = (total_time * total_time / n_runs) - (mean_time * mean_time);
+    double std_time = std::sqrt(variance_time);  // Calcul de l'écart-type du temps d'exécution
 
     // Enregistrer la moyenne et l'écart-type dans le fichier CSV de statistiques
-    stats_file << function_name << "," << n_dims << "," << mean_fitness << "," << std_fitness << std::endl;
+    stats_file << function_name << "," << n_dims << "," << mean_fitness << "," << std_fitness << "," << mean_time << "," << std_time << std::endl;
 }
 
 int main() {
     // Fichier CSV d'exécution
     std::ofstream execution_file("execution_results.csv");
-    execution_file << "Function,Dimension,Run,Fitness\n";
+    execution_file << "Function,Dimension,Run,Fitness,Execution_Time\n";  // Ajout de la colonne pour le temps d'exécution
 
     // Fichier CSV de statistiques
     std::ofstream stats_file("mean_std_fitness.csv");
-    stats_file << "Function,Dimension,Mean Fitness,Std Fitness\n";
+    stats_file << "Function,Dimension,Mean Fitness,Std Fitness,Mean Time,Std Time\n";  // Ajout des colonnes pour les temps d'exécution
 
     // Paramètres
     int epoch = 5000;  // Nombre d'époques
