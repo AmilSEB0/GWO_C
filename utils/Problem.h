@@ -10,7 +10,7 @@ public:
             const std::function<std::vector<double>(const std::vector<double>&)>& obj_func);
 
     std::vector<double> correct_solution(const std::vector<double>& x) const;
-    std::vector<double> generate_solution(bool encoded = false);
+    std::vector<double> generate_solution();
 
     size_t getNDims() const;
     std::string getMinMax() const;

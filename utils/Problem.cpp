@@ -39,7 +39,7 @@ std::vector<double> Problem::correct_solution(const std::vector<double>& x) cons
     return x_new; // Solution corrigée
 }
 
-std::vector<double> Problem::generate_solution(bool encoded) {
+std::vector<double> Problem::generate_solution() {
     std::vector<double> x;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -55,7 +55,7 @@ std::vector<double> Problem::generate_solution(bool encoded) {
 }
 
 void Problem::set_functions() {
-    std::vector<double> tested_solution = generate_solution(true);
+    std::vector<double> tested_solution = generate_solution();
     n_dims_ = tested_solution.size();
     std::vector<double> result = obj_func_(tested_solution);
 
