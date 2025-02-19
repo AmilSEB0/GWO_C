@@ -4,8 +4,6 @@ project(GWO_C)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(GWO_C main.cpp
-        Optimizer.h
-        Optimizer.cpp
         utils/Agent.h
         utils/Agent.cpp
         utils/Problem.h

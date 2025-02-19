@@ -1,55 +1,62 @@
-// #include <iostream>
-// #include <vector>
-// #include "OriginalGWO.h"
-// #include "utils/Problem.h"
+/*#include <iostream>
+#include <vector>
+#include "OriginalGWO.h"
+#include "utils/Problem.h"
 
-// // Fonction objectif : somme des carrés des éléments de la solution
-// std::vector<double> objective_function(const std::vector<double>& solution) {
-//     std::vector<double> result(1, 0.0);  // Valeur retournée pour la cible (fitness)
-//     for (double value : solution) {
-//         result[0] += value * value;
-//     }
-//     return result;
-// }
+// Fonction objectif : somme des carrés des éléments de la solution
+std::vector<double> objective_function(const std::vector<double>& solution) {
+    std::vector<double> result(1, 0.0);  // Valeur retournée pour la cible (fitness)
+    for (double value : solution) {
+        result[0] += value * value;
+    }
+    return result;
 
-// int main() {
-//     // Définir les bornes du problème pour chaque dimension (par exemple, [-10, 10] pour chaque dimension)
-//     int n_dims = 30;  // Nombre de dimensions
+    /*const double A = 10;
+    double sum = 0;
+    for (size_t i = 0; i < solution.size(); ++i) {
+        sum += std::pow(solution[i], 2) - A * std::cos(2 * M_PI * solution[i]);
+    }
+    return std::vector<double>{A * solution.size() + sum};#1#
+}
 
-//     // Créer des vecteurs de bornes pour chaque dimension
-//     std::vector<std::vector<double>> lb(n_dims, std::vector<double>(1, -10.0));  // Vecteur de bornes inférieures, -10 pour chaque dimension
-//     std::vector<std::vector<double>> ub(n_dims, std::vector<double>(1, 10.0));   // Vecteur de bornes supérieures, 10 pour chaque dimension
+int main() {
+    // Définir les bornes du problème pour chaque dimension (par exemple, [-10, 10] pour chaque dimension)
+    int n_dims = 30;  // Nombre de dimensions
 
-//     // Créer un objet Problem
-//     std::string minmax = "min";  // Minimisation
-//     Problem problem(lb, ub, minmax, objective_function);
+    // Créer des vecteurs de bornes pour chaque dimension
+    std::vector<std::vector<double>> lb(n_dims, std::vector<double>(1, -10.0));  // Vecteur de bornes inférieures, -10 pour chaque dimension
+    std::vector<std::vector<double>> ub(n_dims, std::vector<double>(1, 10.0));   // Vecteur de bornes supérieures, 10 pour chaque dimension
 
-//     // Initialiser l'optimiseur GWO
-//     int epoch = 1000;  // Nombre d'époques
-//     int pop_size = 50;  // Taille de la population
-//     OriginalGWO gwo(epoch, pop_size);
+    // Créer un objet Problem
+    std::string minmax = "min";  // Minimisation
+    Problem problem(lb, ub, minmax, objective_function);
 
-//     // Résoudre le problème avec GWO
-//     std::shared_ptr<Agent> g_best = gwo.solve(&problem);  // Résultat de la solution optimale
+    // Initialiser l'optimiseur GWO
+    int epoch = 1000;  // Nombre d'époques
+    int pop_size = 50;  // Taille de la population
+    OriginalGWO gwo(epoch, pop_size);
 
-//     // Afficher la solution optimale et son fitness
-//     std::cout << "Solution optimale: ";
-//     for (double val : g_best->get_solution()) {
-//         std::cout << val << " ";
-//     }
-//     std::cout << std::endl;
-//     std::cout << "Fitness: " << g_best->get_target() << std::endl;
+    // Résoudre le problème avec GWO
+    std::shared_ptr<Agent> g_best = gwo.solve(&problem);  // Résultat de la solution optimale
 
-//     // Afficher les détails de la meilleure solution trouvée pendant l'optimisation
-//     std::cout << "Solution globale optimale: ";
-//     for (double val : gwo.get_global_best()->get_solution()) {
-//         std::cout << val << " ";
-//     }
-//     std::cout << std::endl;
-//     std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target() << std::endl;
+    // Afficher la solution optimale et son fitness
+    std::cout << "Solution optimale: ";
+    for (double val : g_best->get_solution()) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "Fitness: " << g_best->get_target() << std::endl;
 
-//     return 0;
-// }
+    // Afficher les détails de la meilleure solution trouvée pendant l'optimisation
+    std::cout << "Solution globale optimale: ";
+    for (double val : gwo.get_global_best()->get_solution()) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target() << std::endl;
+
+    return 0;
+}*/
 
 #include <iostream>
 #include <vector>
