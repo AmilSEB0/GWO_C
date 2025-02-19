@@ -47,11 +47,8 @@ private:
     std::mt19937 generator;
     double checkInt(const std::string& name, double value, std::pair<int, int> bound = {1, 100000});
     std::shared_ptr<Agent> g_best;
-    std::shared_ptr<Agent> g_worst;
     std::vector<std::shared_ptr<Agent>> list_global_best;
     std::vector<std::shared_ptr<Agent>> list_current_best;
-    std::vector<std::shared_ptr<Agent>> list_global_worst;
-    std::vector<std::shared_ptr<Agent>> list_current_worst;
     std::vector<double> list_epoch_time;
     std::vector<double> list_global_best_fit;
     std::vector<std::shared_ptr<Agent>> list_current_best_fit;

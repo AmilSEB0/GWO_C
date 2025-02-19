@@ -5,7 +5,7 @@
 #include <random>
 
 // Constructeur de la classe OriginalGWO
-OriginalGWO::OriginalGWO(int epoch, int pop_size) : g_best(nullptr), g_worst(nullptr), problem(nullptr) {
+OriginalGWO::OriginalGWO(int epoch, int pop_size) : g_best(nullptr), problem(nullptr) {
     // Vérification et assignation des valeurs pour epoch et pop_size
     this->epoch = checkInt("epoch", epoch, {1, 100000});
     this->pop_size = checkInt("pop_size", pop_size, {5, 10000});
@@ -14,8 +14,6 @@ OriginalGWO::OriginalGWO(int epoch, int pop_size) : g_best(nullptr), g_worst(nul
     list_epoch_time.clear();
     list_global_best.clear();
     list_current_best.clear();
-    list_global_worst.clear();
-    list_current_worst.clear();
     list_global_best_fit.clear();
     list_current_best_fit.clear();
     list_diversity.clear();
@@ -27,8 +25,6 @@ OriginalGWO::~OriginalGWO() {
     pop.clear();
     list_global_best.clear();
     list_current_best.clear();
-    list_global_worst.clear();
-    list_current_worst.clear();
     list_epoch_time.clear();
     list_global_best_fit.clear();
     list_current_best_fit.clear();
@@ -52,22 +48,14 @@ void OriginalGWO::check_problem(Problem* problem) {
     this->problem = problem; // Assignation de l'instance de problème
     pop.clear();
     g_best = nullptr;
-    g_worst = nullptr;
 }
 
 // Fonction principale de résolution de l'optimiseur GWO
 std::shared_ptr<Agent> OriginalGWO::solve(Problem* problem, const std::vector<std::vector<double>>& starting_solutions, int seed) {
     check_problem(problem); // Vérification du problème avant résolution
 
-    // Si la population est vide, générer la population initiale
-    if (pop.empty()) {
-        if (pop_size <= 0) {
-            throw std::runtime_error("Population size must be greater than zero.");
-        }
-        pop = generate_population(pop_size); // Générer la population initiale
-    }
-
-    after_initialization(); // Traitement après l'initialisation de la population
+    // Générer la population initiale
+    pop = generate_population(pop_size); // Générer la population initiale
 
     // Exécution de l'optimisation sur plusieurs epochs
     for (int e = 1; e <= epoch; ++e) {
@@ -85,49 +73,6 @@ std::shared_ptr<Agent> OriginalGWO::solve(Problem* problem, const std::vector<st
     return g_best; // Retour de l'agent globalement meilleur
 }
 
-// Traitement après initialisation
-void OriginalGWO::after_initialization() {
-    if (pop.empty()) {
-        throw std::runtime_error("Population is empty after initialization.");
-    }
-
-    std::vector<double> list_fits;
-    // Collecte des valeurs de fitness des agents
-    for (auto& agent : pop) {
-        list_fits.push_back(agent->get_target());
-    }
-
-    std::vector<size_t> indices(list_fits.size());
-    std::iota(indices.begin(), indices.end(), 0); // Initialise les indices
-
-    // Tri des indices en fonction du fitness (selon si on maximise ou minimise)
-    if (problem->getMinMax() == "max") {
-        std::sort(indices.begin(), indices.end(), [&list_fits](size_t i1, size_t i2) {
-            return list_fits[i1] > list_fits[i2]; // Maximisation
-        });
-    } else {
-        std::sort(indices.begin(), indices.end(), [&list_fits](size_t i1, size_t i2) {
-            return list_fits[i1] < list_fits[i2]; // Minimisation
-        });
-    }
-
-    // Création d'une population triée par fitness
-    std::vector<std::shared_ptr<Agent>> sorted_pop;
-    for (size_t idx : indices) {
-        sorted_pop.push_back(pop[idx]);
-    }
-
-    pop = sorted_pop; // Mise à jour de la population triée
-    g_best = pop.front(); // L'agent avec le meilleur fitness
-    g_worst = pop.back(); // L'agent avec le pire fitness
-
-    // Suivi des meilleurs et pires agents
-    list_global_best.push_back(g_best->copy());
-    list_current_best.push_back(g_best->copy());
-    list_global_worst.push_back(g_worst->copy());
-    list_current_worst.push_back(g_worst->copy());
-}
-
 // Fonction pour générer un agent vide
 std::shared_ptr<Agent> OriginalGWO::generate_empty_agent(const std::vector<double>& solution) {
     std::vector<double> agent_solution = solution.empty() ? problem->generate_solution() : solution;
@@ -143,10 +88,10 @@ std::shared_ptr<Agent> OriginalGWO::generate_agent(const std::vector<double>& so
 
 // Fonction pour obtenir l'agent avec le meilleur fitness global
 std::shared_ptr<Agent> OriginalGWO::get_global_best() const {
-    if (this->list_global_best.empty()) {
+    if ( this->g_best == nullptr) {
         throw std::runtime_error("No global best found. The optimizer has not run yet.");
     }
-    return this->list_global_best.back(); // Le dernier élément est le meilleur
+    return this->g_best; // Le dernier élément est le meilleur
 }
 
 // Fonction pour obtenir l'agent "meilleur" entre deux
@@ -158,6 +103,9 @@ std::shared_ptr<Agent> OriginalGWO::get_better_agent(
     /**
      * Cette fonction retourne l'agent avec la meilleure performance en fonction de la "fitness".
      */
+    if (agent_y == nullptr) {
+        return agent_x;
+    }
     std::map<std::string, int> minmax_dict = {{"min", 0}, {"max", 1}};
     int idx = minmax_dict[minmax];  // 0 pour minimiser, 1 pour maximiser
 
@@ -199,7 +147,6 @@ double OriginalGWO::get_target(const std::vector<double>& solution, bool counted
 
 // Mise à jour de l'agent globalement meilleur
 std::shared_ptr<Agent> OriginalGWO::update_global_best_agent(std::vector<std::shared_ptr<Agent>>& pop, bool save) {
-    std::cout << "Solution glosssssssssssss: ";
     std::vector<double> list_fits;
     // Collecte des fitness des agents
     for (auto& agent : pop) {
@@ -225,16 +172,11 @@ std::shared_ptr<Agent> OriginalGWO::update_global_best_agent(std::vector<std::sh
     }
 
     auto c_best = sorted_pop[0];  // Agent avec le meilleur fitness
-    auto c_worst = sorted_pop.back();  // Agent avec le pire fitness
 
     // Sauvegarde des meilleurs et pires agents
     this->list_current_best.push_back(c_best);
-    auto better = get_better_agent(c_best, this->list_global_best.back(), this->problem->getMinMax());
+    auto better = get_better_agent(c_best, g_best, this->problem->getMinMax());
     this->list_global_best.push_back(better);
-
-    this->list_current_worst.push_back(c_worst);
-    auto worse = get_better_agent(c_worst, this->list_global_worst.back(), this->problem->getMinMax(), true);
-    this->list_global_worst.push_back(worse);
 
     return better;  // Retourner le meilleur agent
 }
@@ -349,9 +291,9 @@ void OriginalGWO::evolve(int epoch) {
         std::vector<double> C3 = generate_random_vector(problem->getNDims(), 0.0, 2.0);
 
         // Calcul de la nouvelle position des agents
-        std::vector<double> X1 = list_best[0]->get_solution();
-        std::vector<double> X2 = list_best[1]->get_solution();
-        std::vector<double> X3 = list_best[2]->get_solution();
+        std::vector<double> X1 = list_best[0]->get_solution(); // Alpha
+        std::vector<double> X2 = list_best[1]->get_solution(); // Beta
+        std::vector<double> X3 = list_best[2]->get_solution(); // Delta
 
         // Mise à jour des positions X1, X2, X3 en fonction des formules
         for (size_t i = 0; i < X1.size(); ++i) {
@@ -370,7 +312,7 @@ void OriginalGWO::evolve(int epoch) {
         pos_new = correct_solution(pos_new);
 
         // Générer un agent avec la nouvelle position
-        auto agent = generate_empty_agent(pos_new); // Utilisation de shared_ptr
+        auto agent = generate_empty_agent(pos_new);
         pop_new.push_back(agent);
 
         // Mise à jour de la cible de l'agent
