@@ -6,7 +6,6 @@
 #include "utils/Agent.h"
 #include "utils/Problem.h"
 #include <random>
-#include <chrono>
 #include <map>
 
 class OriginalGWO {
@@ -38,8 +37,6 @@ private:
 
     std::vector<double> generate_random_vector(int n_dims);
 
-    void track_optimize_step(std::vector<std::shared_ptr<Agent>>& pop, int epoch, double runtime);
-
     std::vector<std::shared_ptr<Agent>> pop;
     Problem* problem;
     int epoch;
@@ -47,12 +44,6 @@ private:
     std::mt19937 generator;
     double checkInt(const std::string& name, double value, std::pair<int, int> bound = {1, 100000});
     std::shared_ptr<Agent> g_best;
-    std::vector<std::shared_ptr<Agent>> list_global_best;
-    std::vector<std::shared_ptr<Agent>> list_current_best;
-    std::vector<double> list_epoch_time;
-    std::vector<double> list_global_best_fit;
-    std::vector<std::shared_ptr<Agent>> list_current_best_fit;
-    std::vector<double> list_diversity;
 };
 
 #endif // ORIGINAL_GWO_H

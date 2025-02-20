@@ -9,26 +9,12 @@ OriginalGWO::OriginalGWO(int epoch, int pop_size) : g_best(nullptr), problem(nul
     // Vérification et assignation des valeurs pour epoch et pop_size
     this->epoch = checkInt("epoch", epoch, {1, 100000});
     this->pop_size = checkInt("pop_size", pop_size, {5, 10000});
-
-    // Initialisation des vecteurs
-    list_epoch_time.clear();
-    list_global_best.clear();
-    list_current_best.clear();
-    list_global_best_fit.clear();
-    list_current_best_fit.clear();
-    list_diversity.clear();
 }
 
 // Destructeur de la classe
 OriginalGWO::~OriginalGWO() {
     // Nettoyage des populations et listes utilisées
     pop.clear();
-    list_global_best.clear();
-    list_current_best.clear();
-    list_epoch_time.clear();
-    list_global_best_fit.clear();
-    list_current_best_fit.clear();
-    list_diversity.clear();
 }
 
 // Fonction pour vérifier les valeurs entières dans les bornes spécifiées
@@ -46,8 +32,6 @@ void OriginalGWO::check_problem(Problem* problem) {
         throw std::invalid_argument("Problem instance is null.");
     }
     this->problem = problem; // Assignation de l'instance de problème
-    pop.clear();
-    g_best = nullptr;
 }
 
 // Fonction principale de résolution de l'optimiseur GWO
@@ -61,13 +45,6 @@ std::shared_ptr<Agent> OriginalGWO::solve(Problem* problem, const std::vector<st
     for (int e = 1; e <= epoch; ++e) {
         evolve(e); // Met à jour la population selon l'algorithme GWO
         g_best = update_global_best_agent(pop); // Mise à jour de l'agent globalement meilleur
-
-        auto start_time = std::chrono::high_resolution_clock::now();
-        auto end_time = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> duration = end_time - start_time;
-        double time_epoch = duration.count();
-
-        track_optimize_step(pop, e, time_epoch); // Suivi de l'optimisation pour cette epoch
     }
 
     return g_best; // Retour de l'agent globalement meilleur
@@ -173,57 +150,10 @@ std::shared_ptr<Agent> OriginalGWO::update_global_best_agent(std::vector<std::sh
 
     auto c_best = sorted_pop[0];  // Agent avec le meilleur fitness
 
-    // Sauvegarde des meilleurs et pires agents
-    this->list_current_best.push_back(c_best);
+    // Sauvegarde du meilleur agent
     auto better = get_better_agent(c_best, g_best, this->problem->getMinMax());
-    this->list_global_best.push_back(better);
 
     return better;  // Retourner le meilleur agent
-}
-
-// Suivi de l'optimisation pour chaque epoch
-void OriginalGWO::track_optimize_step(std::vector<std::shared_ptr<Agent>>& pop, int epoch, double runtime) {
-    // Ajouter le temps et les performances de cette epoch
-    this->list_epoch_time.push_back(runtime);
-    this->list_global_best_fit.push_back(this->list_global_best.back()->get_target());
-    this->list_current_best_fit.push_back(this->list_current_best.back());
-
-    // Calcul de la diversité dans la population
-    std::vector<std::vector<double>> pos_matrix;
-    for (auto& agent : pop) {
-        pos_matrix.push_back(agent->get_solution());
-    }
-
-    size_t num_agents = pos_matrix.size();
-    size_t num_dimensions = pos_matrix[0].size();
-    std::vector<double> median_pos(num_dimensions, 0.0);
-
-    for (size_t dim = 0; dim < num_dimensions; ++dim) {
-        std::vector<double> dimension_values(num_agents);
-        for (size_t i = 0; i < num_agents; ++i) {
-            dimension_values[i] = pos_matrix[i][dim];
-        }
-        std::sort(dimension_values.begin(), dimension_values.end());
-        median_pos[dim] = dimension_values[num_agents / 2];
-    }
-
-    // Calcul de la diversité
-    std::vector<double> div(num_dimensions, 0.0);
-    for (size_t dim = 0; dim < num_dimensions; ++dim) {
-        double sum_abs = 0.0;
-        for (size_t i = 0; i < num_agents; ++i) {
-            sum_abs += std::abs(median_pos[dim] - pos_matrix[i][dim]);
-        }
-        div[dim] = sum_abs / num_agents;
-    }
-
-    double avg_div = std::accumulate(div.begin(), div.end(), 0.0) / num_dimensions;
-    this->list_diversity.push_back(avg_div);
-
-    std::cout << ">>> Epoch: " << epoch
-              << ", Current best: " << this->list_current_best.back()->get_target()
-              << ", Global best: " << this->list_global_best.back()->get_target()
-              << ", Runtime: " << runtime << " seconds" << std::endl;
 }
 
 // Fonction pour générer un vecteur de nombres aléatoires
@@ -246,7 +176,7 @@ void OriginalGWO::evolve(int epoch) {
     }
 
     std::vector<int> indices(list_fits.size());
-    std::iota(indices.begin(), indices.end(), 0); // Initialize indices with 0, 1, ..., n-1
+    std::iota(indices.begin(), indices.end(), 0);
 
     std::sort(indices.begin(), indices.end(), [&list_fits](int i1, int i2) {
         return list_fits[i1] < list_fits[i2]; // Tri par fitness

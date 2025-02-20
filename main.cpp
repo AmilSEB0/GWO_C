@@ -1,65 +1,3 @@
-/*
-#include <iostream>
-#include <vector>
-#include "OriginalGWO.h"
-#include "utils/Problem.h"
-
-// Fonction objectif : somme des carrés des éléments de la solution
-std::vector<double> objective_function(const std::vector<double>& solution) {
-    std::vector<double> result(1, 0.0);  // Valeur retournée pour la cible (fitness)
-    for (double value : solution) {
-        result[0] += value * value;
-    }
-    return result;
-
-    /*
-    const double A = 10;
-    double sum = 0;
-    for (size_t i = 0; i < solution.size(); ++i) {
-        sum += std::pow(solution[i], 2) - A * std::cos(2 * M_PI * solution[i]);
-    }
-    return std::vector<double>{A * solution.size() + sum};#1#
-}
-
-int main() {
-    // Définir les bornes du problème pour chaque dimension (par exemple, [-10, 10] pour chaque dimension)
-    int n_dims = 30;  // Nombre de dimensions
-
-    // Créer des vecteurs de bornes pour chaque dimension
-    std::vector<std::vector<double>> lb(n_dims, std::vector<double>(1, -10.0));  // Vecteur de bornes inférieures, -10 pour chaque dimension
-    std::vector<std::vector<double>> ub(n_dims, std::vector<double>(1, 10.0));   // Vecteur de bornes supérieures, 10 pour chaque dimension
-
-    // Créer un objet Problem
-    std::string minmax = "min";  // Minimisation
-    Problem problem(lb, ub, minmax, objective_function);
-
-    // Initialiser l'optimiseur GWO
-    int epoch = 1000;  // Nombre d'époques
-    int pop_size = 50;  // Taille de la population
-    OriginalGWO gwo(epoch, pop_size);
-
-    // Résoudre le problème avec GWO
-    std::shared_ptr<Agent> g_best = gwo.solve(&problem);  // Résultat de la solution optimale
-
-    // Afficher la solution optimale et son fitness
-    std::cout << "Solution optimale: ";
-    for (double val : g_best->get_solution()) {
-        std::cout << val << " ";
-    }
-    std::cout << std::endl;
-    std::cout << "Fitness: " << g_best->get_target() << std::endl;
-
-    // Afficher les détails de la meilleure solution trouvée pendant l'optimisation
-    std::cout << "Solution globale optimale: ";
-    for (double val : gwo.get_global_best()->get_solution()) {
-        std::cout << val << " ";
-    }
-    std::cout << std::endl;
-    std::cout << "Fitness globale optimale: " << gwo.get_global_best()->get_target() << std::endl;
-
-    return 0;
-}
-*/
 
 #include <iostream>
 #include <vector>
@@ -107,6 +45,8 @@ void run_benchmark(int n_dims, const std::vector<std::vector<double>>& lb, const
     double total_fitness = 0.0;
     double fitness_squared_sum = 0.0;
     double total_time = 0.0; // Pour le calcul du temps total
+    std::vector<double> fitness_values; // Liste pour les valeurs de fitness
+    std::vector<double> time_values;    // Liste pour les temps d'exécution
 
     for (int run_idx = 0; run_idx < n_runs; ++run_idx) {
         // Créer un objet Problem avec la fonction objectif appropriée
@@ -127,9 +67,11 @@ void run_benchmark(int n_dims, const std::vector<std::vector<double>>& lb, const
         double fitness = g_best->get_target();
         total_fitness += fitness;
         fitness_squared_sum += fitness * fitness;
+        fitness_values.push_back(fitness);  // Enregistrer la valeur de fitness
 
         // Ajouter le temps d'exécution pour cette exécution
         total_time += execution_duration.count();
+        time_values.push_back(execution_duration.count());  // Enregistrer le temps d'exécution
 
         // Enregistrer la fitness et le temps d'exécution de cette exécution dans le fichier CSV d'exécution
         execution_file << function_name << "," << n_dims << "," << run_idx + 1 << "," << fitness << "," << execution_duration.count() << std::endl;
@@ -137,12 +79,23 @@ void run_benchmark(int n_dims, const std::vector<std::vector<double>>& lb, const
 
     // Calculer la moyenne et l'écart-type pour cette fonction et dimension
     double mean_fitness = total_fitness / n_runs;
-    double variance_fitness = (fitness_squared_sum / n_runs) - (mean_fitness * mean_fitness);
+
+    // Calcul de la variance et de l'écart-type pour la fitness : Diviser par n-1 pour un échantillon
+    double variance_fitness = 0.0;
+    for (double fitness : fitness_values) {
+        variance_fitness += std::pow(fitness - mean_fitness, 2);
+    }
+    variance_fitness /= (n_runs - 1);  // Diviser par n-1
     double std_fitness = std::sqrt(variance_fitness);
 
-    double mean_time = total_time / n_runs;  // Calcul de la moyenne du temps d'exécution
-    double variance_time = (total_time * total_time / n_runs) - (mean_time * mean_time);
-    double std_time = std::sqrt(variance_time);  // Calcul de l'écart-type du temps d'exécution
+    // Calcul de la moyenne et de l'écart-type du temps d'exécution
+    double mean_time = total_time / n_runs;
+    double variance_time = 0.0;
+    for (double time : time_values) {
+        variance_time += std::pow(time - mean_time, 2);
+    }
+    variance_time /= (n_runs - 1);  // Diviser par n-1
+    double std_time = std::sqrt(variance_time);
 
     // Enregistrer la moyenne et l'écart-type dans le fichier CSV de statistiques
     stats_file << function_name << "," << n_dims << "," << mean_fitness << "," << std_fitness << "," << mean_time << "," << std_time << std::endl;
