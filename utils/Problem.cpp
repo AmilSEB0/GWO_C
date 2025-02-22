@@ -1,10 +1,7 @@
 #include "Problem.h"
-#include <iostream>
 #include <stdexcept>
 #include <random>
-#include <cmath>
 
-// Constructeur de la classe Problem
 Problem::Problem(const std::vector<std::vector<double>>& lb, const std::vector<std::vector<double>>& ub, const std::string& minmax,
                  const std::function<std::vector<double>(const std::vector<double>&)>& obj_func)
     : lb_(lb), ub_(ub), minmax_(minmax), obj_func_(obj_func) {
@@ -17,10 +14,9 @@ void Problem::set_bounds(const std::vector<std::vector<double>>& lb, const std::
     lb_ = lb;  // Enregistre les bornes inférieures
     ub_ = ub;  // Enregistre les bornes supérieures
 
-    lb_flat_.clear();  // Réinitialisation du vecteur aplati pour les bornes inférieures
-    ub_flat_.clear();  // Réinitialisation du vecteur aplati pour les bornes supérieures
+    lb_flat_.clear();  // Réinitialisation du vecteur pour les bornes inférieures
+    ub_flat_.clear();  // Réinitialisation du vecteur pour les bornes supérieures
 
-    // Aplatissement des bornes
     for (size_t i = 0; i < lb_.size(); ++i) {
         lb_flat_.insert(lb_flat_.end(), lb_[i].begin(), lb_[i].end());  // Fusion des bornes inférieures
         ub_flat_.insert(ub_flat_.end(), ub_[i].begin(), ub_[i].end());  // Fusion des bornes supérieures
@@ -70,7 +66,7 @@ void Problem::set_functions() {
 
     // Vérifie que la fonction d'objectif retourne des résultats valides
     if (result.empty()) {
-        throw std::invalid_argument("obj_func needs to return a non-empty vector of values.");
+        throw std::invalid_argument("obj_func doit retourner un vecteur non vide de valeurs.");
     }
 
     obj_weights_ = std::vector<double>(result.size(), 1.0);  // Initialisation des poids des objectifs (égal à 1 pour chaque objectif)
@@ -87,7 +83,7 @@ std::string Problem::getMinMax() const {
 }
 
 // Fonction pour calculer la fitness d'une solution
-double Problem::get_fitness(const std::vector<double>& solution) const {
+double Problem::get_target(const std::vector<double>& solution) const {
     std::vector<double> objectives = obj_func_(solution);  // Evaluation de la solution par la fonction d'objectif
     double fitness = 0.0;  // Initialisation de la fitness
 

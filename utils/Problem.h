@@ -4,13 +4,12 @@
 #include <functional>
 #include <memory>  // Nécessaire pour std::shared_ptr
 
-// Classe représentant un problème d'optimisation
 class Problem {
 public:
     // Constructeur du problème d'optimisation
     // 'lb' : bornes inférieures pour chaque dimension
     // 'ub' : bornes supérieures pour chaque dimension
-    // 'minmax' : chaîne qui indique si le problème est de minimisation ou maximisation
+    // 'minmax' : chaîne indiquant si le problème est de minimisation ou de maximisation
     // 'obj_func' : fonction d'objectif qui évalue une solution donnée
     Problem(const std::vector<std::vector<double>>& lb, const std::vector<std::vector<double>>& ub, const std::string& minmax,
             const std::function<std::vector<double>(const std::vector<double>&)>& obj_func);
@@ -27,18 +26,17 @@ public:
     // Getter pour savoir si le problème est de minimisation ou de maximisation
     std::string getMinMax() const;
 
-    // Remplacer la méthode get_target
     // Calcule et retourne directement la fitness d'une solution donnée
-    double get_fitness(const std::vector<double>& solution) const;
+    double get_target(const std::vector<double>& solution) const;
 
 private:
     // Attributs définissant les bornes pour chaque dimension du problème
     std::vector<std::vector<double>> lb_;  // Liste des bornes inférieures pour chaque dimension
     std::vector<std::vector<double>> ub_;  // Liste des bornes supérieures pour chaque dimension
 
-    // Vecteurs aplatis pour faciliter la gestion des bornes
-    std::vector<double> lb_flat_;  // Vecteur aplati des bornes inférieures
-    std::vector<double> ub_flat_;  // Vecteur aplati des bornes supérieures
+    // Vecteurs pour faciliter la gestion des bornes
+    std::vector<double> lb_flat_;  // Vecteur des bornes inférieures
+    std::vector<double> ub_flat_;  // Vecteur des bornes supérieures
 
     // Attribut pour définir si le problème est une minimisation ou une maximisation
     std::string minmax_;
